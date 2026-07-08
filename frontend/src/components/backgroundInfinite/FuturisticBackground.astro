@@ -1,0 +1,228 @@
+
+<div class="canvas-container">
+  <canvas id="futuristic-bg"></canvas>
+</div>
+
+<script>
+  const canvas = document.getElementById('futuristic-bg') as HTMLCanvasElement;
+  const ctx = canvas.getContext('2d');
+
+  if (ctx) {
+    let animationFrameId: number;
+    let particles: Particle[] = [];
+    const numParticles = 650; 
+
+    let centerX: number;
+    let centerY: number;
+
+    const resizeCanvas = () => {
+      const displayWidth = window.innerWidth;
+      const displayHeight = window.innerHeight;
+      
+      // REFACTOR DE NITIDEZ EXTREMA: Ajuste por Device Pixel Ratio (pantallas Retina/HiDPI)
+      const dpr = window.devicePixelRatio || 1;
+      
+      // Tamaño interno del canvas (resolución real)
+      canvas.width = displayWidth * dpr;
+      canvas.height = displayHeight * dpr;
+      
+      // Escalamos el contexto para poder seguir programando con las medidas del layout
+      ctx.scale(dpr, dpr);
+
+      centerX = displayWidth / 2;
+      centerY = displayHeight / 2;
+
+      // Reiniciamos/adaptamos al vuelo al cambiar de tamaño
+      particles.forEach(particle => {
+        if (!particle.isWhiteWarp) {
+          particle.x = Math.random() * displayWidth;
+          particle.y = Math.random() * displayHeight;
+        } else {
+          particle.resetWhiteWarp();
+        }
+      });
+    };
+
+    window.addEventListener('resize', resizeCanvas, { passive: true });
+
+    class Particle {
+      x: number;
+      y: number;
+      z: number;
+      size: number;
+      speedX: number;
+      speedY: number;
+      alpha: number;
+      fadeSpeed: number;
+      color: string;
+      
+      isWhiteWarp: boolean;
+      isLargeWhiteWarp: boolean;
+      targetX!: number;
+      targetY!: number;
+      warpSpeedZ!: number;
+      baseWarpSize!: number;
+
+      constructor() {
+        const rand = Math.random();
+        this.isWhiteWarp = rand < 0.35; 
+        this.isLargeWhiteWarp = rand < 0.10; 
+
+        if (this.isWhiteWarp) {
+          this.x = 0;
+          this.y = 0;
+          this.z = 0;
+          this.color = 'rgba(255, 255, 255,';
+          this.alpha = Math.random();
+          this.fadeSpeed = Math.random() * 0.03 + 0.008; 
+          this.resetWhiteWarp();
+        } else {
+          this.x = Math.random() * window.innerWidth;
+          this.y = Math.random() * window.innerHeight;
+          this.z = Math.random() * 3.5 + 1; 
+
+          this.size = (Math.random() * 1.1 + 0.3) / this.z;
+          this.speedX = ((Math.random() - 0.3) * 0.35) / this.z;
+          this.speedY = ((Math.random() - 0.5) * 0.12) / this.z;
+          
+          this.alpha = Math.random();
+          this.fadeSpeed = Math.random() * 0.015 + 0.005;
+          
+          const colors = [
+            'rgba(0, 242, 254,', 
+            'rgba(255, 221, 64,', 
+            'rgba(40, 90, 255,' // Azul más brillante para que no sea opaco en el negro
+          ];
+          const colorIndex = Math.floor(Math.random() * colors.length);
+          this.color = colors[colorIndex];
+        }
+      }
+
+      resetWhiteWarp() {
+        const displayWidth = window.innerWidth;
+        const displayHeight = window.innerHeight;
+        const angle = Math.random() * Math.PI * 2;
+        const radius = Math.max(displayWidth, displayHeight) * 0.75; 
+        
+        this.targetX = centerX + Math.cos(angle) * radius;
+        this.targetY = centerY + Math.sin(angle) * radius;
+        
+        this.z = Math.random() * 5 + 3; 
+        
+        if (this.isLargeWhiteWarp) {
+          this.baseWarpSize = Math.random() * 0.8 + 0.4; 
+          this.warpSpeedZ = Math.random() * 0.008 + 0.004; 
+        } else {
+          this.baseWarpSize = Math.random() * 0.25 + 0.1; 
+          this.warpSpeedZ = Math.random() * 0.005 + 0.002; 
+        }
+      }
+
+      update() {
+        if (this.isWhiteWarp) {
+          this.z -= this.warpSpeedZ;
+
+          if (this.z < 1) {
+            this.resetWhiteWarp();
+          }
+          
+          this.x = centerX + (this.targetX - centerX) / this.z;
+          this.y = centerY + (this.targetY - centerY) / this.z;
+        } else {
+          this.x += this.speedX;
+          this.y += this.speedY;
+
+          const displayWidth = window.innerWidth;
+          const displayHeight = window.innerHeight;
+
+          if (this.x < 0) this.x = displayWidth;
+          if (this.x > displayWidth) this.x = 0;
+          if (this.y < 0) this.y = displayHeight;
+          if (this.y > displayHeight) this.y = 0;
+        }
+
+        this.alpha += this.fadeSpeed;
+        if (this.alpha > 0.98 || this.alpha < 0.2) {
+          this.fadeSpeed = -this.fadeSpeed;
+        }
+      }
+
+      draw() {
+        if (!ctx) return;
+        ctx.beginPath();
+        
+        let currentSize = this.size;
+        let currentAlpha = this.alpha;
+
+        if (this.isWhiteWarp) {
+          if (this.z < 1) return;
+          
+          const multiplier = this.isLargeWhiteWarp ? 6 : 3.5;
+          currentSize = (this.baseWarpSize * multiplier) / this.z; 
+          
+          let distanceFade = 1 - (this.z / 8);
+          currentAlpha = Math.max(0, Math.min(1, this.alpha * distanceFade));
+        } else {
+          currentAlpha = this.alpha / this.z;
+        }
+
+        // Renderizado nativo directo libre de desenfoques de sombra
+        ctx.fillStyle = `${this.color} ${currentAlpha})`;
+        ctx.arc(this.x, this.y, Math.max(0.1, currentSize), 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    const init = () => {
+      // Disparamos el setup responsive inicial con cálculo de DPR antes de crear nada
+      resizeCanvas();
+
+      particles = [];
+      for (let i = 0; i < numParticles; i++) {
+        particles.push(new Particle());
+      }
+    };
+
+    const animate = () => {
+      // Limpieza total instantánea del canvas para evitar bordes difusos
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+      particles.forEach((particle) => {
+        particle.update();
+        particle.draw();
+      });
+
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    init();
+    animate();
+
+    document.addEventListener('astro:before-swap', () => {
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener('resize', resizeCanvas);
+    });
+  }
+</script>
+
+<style>
+  .canvas-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    width: 100dvw;
+    height: 100dvh;
+    z-index: -1;
+    background-color: #040406; /* El fondo oscuro absoluto se maneja por CSS para máxima nitidez */
+    overflow: hidden;
+  }
+  
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+</style>
