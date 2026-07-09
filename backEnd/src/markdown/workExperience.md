@@ -1,0 +1,1 @@
+//Historial laboral detallado, enfocado en logros y no solo tareas.

@@ -1,0 +1,1 @@
+//Listado técnico categorizado. Esto ayuda a la IA a responder rápido cuando pregunten "¿Qué tecnologías manejas?

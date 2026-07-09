@@ -1,0 +1,226 @@
+ /* Contenedor central flexible */
+  .trigger-zone {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 600px;
+    height: 200px;
+    background: transparent;
+    transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  .trigger-zone.fade-out-fast {
+    opacity: 0;
+  }
+
+  /* ==================== 1. EL BUSCADOR ==================== */
+  .search-box-wrapper {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(0, 242, 254, 0.1);
+    border-radius: 30px;
+    padding: 6px 6px 6px 20px;
+    width: 90%;
+    backdrop-filter: blur(12px);
+    
+    opacity: 0;
+    visibility: hidden; 
+    
+    transform: scale(0.96);
+    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s, border-color 0.25s, box-shadow 0.25s;
+    cursor: pointer;
+  }
+
+  .search-box-wrapper.active {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+    border-color: #00f2fe;
+    box-shadow: 0 0 25px rgba(0, 242, 254, 0.25);
+  }
+
+  .search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #ffffff;
+    font-size: 1rem;
+    font-family: system-ui, -apple-system, sans-serif;
+    cursor: text;
+  }
+
+  .search-btn {
+    background: #00f2fe;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #060608;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.2s;
+  }
+
+  .search-btn:hover {
+    transform: scale(1.05);
+    background: #ffffff;
+  }
+
+  /* ==================== 2. EL OJO DE IA ==================== */
+  .eye-wrapper {
+    position: absolute;
+    pointer-events: none;
+    opacity: 0;
+    transform: scale(0.7);
+    transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .eye-wrapper.active {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .eye {
+    width: 65px;
+    height: 36px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    transition: height 0.1s ease-in-out;
+  }
+
+  .pupil {
+    width: 18px;
+    height: 18px;
+    background: #00f2fe;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #00f2fe;
+  }
+
+  .eye.wink {
+    height: 1px;
+  }
+
+  /* ==================== 3. SANTIAGO CRESCIMBENI ==================== */
+  .brand-wrapper {
+    position: absolute;
+    pointer-events: none;
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    text-align: center;
+    width: 100%;
+  }
+
+  .brand-wrapper.active {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .brand-text {
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 2.2rem;
+    font-weight: 300;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin: 0;
+    color: #ffffff;
+    transition: filter 0.4s ease;
+  }
+
+  .first-name {
+    color: #ffffff;
+    font-weight: 300;
+  }
+
+  .last-name {
+    color: #00f2fe;
+    font-weight: 600;
+  }
+
+  .brand-wrapper.glow .brand-text {
+    filter: drop-shadow(0 0 8px rgba(0, 242, 254, 0.6)) drop-shadow(0 0 20px rgba(0, 242, 254, 0.2));
+  }
+
+  /* ==================== 4. FLASH DE CÁMARA ==================== */
+  .flash-overlay {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300vw;
+    height: 300vh;
+    background: #ffffff;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 999;
+  }
+
+  .flash-overlay.trigger {
+    animation: instantFlash 0.18s ease-out forwards;
+  }
+
+  @keyframes instantFlash {
+    0% { opacity: 0; }
+    15% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  /* ==================== 5. CAJA DE RESPUESTA DE LA IA ==================== */
+  .ai-response-box {
+    position: fixed;
+    top: 65%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 550px;
+    max-height: 160px;
+    overflow-y: auto;
+    background: rgba(10, 10, 15, 0.8);
+    border: 1px solid rgba(0, 242, 254, 0.2);
+    border-radius: 16px;
+    padding: 16px;
+    color: #f1f5f9;
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    text-align: left;
+    backdrop-filter: blur(12px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 242, 254, 0.05);
+  }
+
+  .ai-response-box.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Custom Scrollbar elegante para la respuesta */
+  .ai-response-box::-webkit-scrollbar {
+    width: 6px;
+  }
+  .ai-response-box::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .ai-response-box::-webkit-scrollbar-thumb {
+    background: rgba(0, 242, 254, 0.3);
+    border-radius: 3px;
+  }
+  .ai-response-box::-webkit-scrollbar-thumb:hover {
+    background: #00f2fe;
+  }
