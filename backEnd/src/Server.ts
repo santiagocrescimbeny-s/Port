@@ -1,8 +1,8 @@
-// src/Server.ts
-import 'dotenv/config'; // <-- CAMBIO CRÍTICO: Carga las variables antes de los demás imports
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import searchRoutes from './routes/SearchRoutes.js';
+import { SearchService } from './services/searchService/SearchService.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -12,6 +12,10 @@ app.use(express.json());
 
 app.use('/api', searchRoutes);
 
-app.listen(PORT, () => {
+// Inicia el servidor y precarga el modelo
+app.listen(PORT, async () => {
   console.log(`🚀 Microservicio ejecutándose con éxito en http://localhost:${PORT}`);
+  
+  // Precarga el modelo en background
+  await SearchService.preloadModel();
 });

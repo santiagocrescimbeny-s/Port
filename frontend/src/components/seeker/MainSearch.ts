@@ -74,73 +74,69 @@ document.addEventListener('DOMContentLoaded', () => {
             isSearching = true;
             if (responseContainer) {
                 responseContainer.classList.add('visible');
-                responseContainer.innerHTML = "";
+                responseContainer.innerHTML = "<p style='color: #00f2fe; text-align: center;'>⏳ Buscando...</p>";
             }
 
+            // ✅ NUEVA LÓGICA: Llamada JSON, no streaming
             const response = await fetch("http://localhost:3000/api/search", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ prompt: query })
             });
 
-            if (!response.body) return;
+            const jsonData = await response.json();
 
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder();
-            let done = false;
-
-            let acumuladorTexto = "";
-            let oracionesRenderizadasCount = 0;
-
-            while (!done) {
-                const { value, done: doneReading } = await reader.read();
-                done = doneReading;
-
-                const chunkValue = decoder.decode(value || new Uint8Array());
-                acumuladorTexto += chunkValue;
-
-                const oraciones = acumuladorTexto.split(/(?<=[.!?])\s+/);
-
+            if (!response.ok) {
                 if (responseContainer) {
-                    const isAtBottom = responseContainer.scrollHeight - responseContainer.scrollTop <= responseContainer.clientHeight + 60;
+                    responseContainer.innerHTML = `<p style='color: #ff6b6b;'>❌ Error: ${jsonData.error}</p>`;
+                }
+                return;
+            }
 
-                    if (oraciones.length > 1) {
-                        for (let i = oracionesRenderizadasCount; i < oraciones.length - 1; i++) {
-                            if (oraciones[i].trim() !== "") {
-                                const span = document.createElement('span');
-                                span.className = "oracion-fade-item";
-                                span.innerText = oraciones[i] + " ";
-                                responseContainer.appendChild(span);
-                                oracionesRenderizadasCount++;
-                            }
-                        }
-                        acumuladorTexto = oraciones[oraciones.length - 1];
-                    }
-
-                    if (done && acumuladorTexto.trim() !== "") {
-                        const span = document.createElement('span');
-                        span.className = "oracion-fade-item";
-                        span.innerText = acumuladorTexto;
-                        responseContainer.appendChild(span);
-                    }
-
-                    if (isAtBottom) {
-                        responseContainer.scrollTop = responseContainer.scrollHeight;
-                    }
+            // ✅ Mostrar resultados
+            if (jsonData.success && jsonData.results.length > 0) {
+                let html = '<div style="padding: 20px;">';
+                html += `<h3 style="color: #00f2fe; margin-top: 0;">📚 Resultados para: "${query}"</h3>`;
+                
+                jsonData.results.forEach((result: any, index: number) => {
+                    html += `
+                        <div style="
+                            background: rgba(0, 242, 254, 0.05);
+                            border-left: 3px solid #00f2fe;
+                            padding: 15px;
+                            margin: 10px 0;
+                            border-radius: 5px;
+                        ">
+                            <p style="color: #ffffff; margin: 0 0 8px 0;">
+                                <strong>Resultado ${index + 1}</strong>
+                            </p>
+                            <p style="color: #cccccc; margin: 0; line-height: 1.6; font-size: 14px;">
+                                ${result.content}
+                            </p>
+                            ${result.similarity ? `<p style="color: #888; font-size: 12px; margin: 8px 0 0 0;">
+                                Relevancia: ${(result.similarity * 100).toFixed(1)}%
+                            </p>` : ''}
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+                if (responseContainer) {
+                    responseContainer.innerHTML = html;
+                }
+            } else {
+                if (responseContainer) {
+                    responseContainer.innerHTML = `<p style='color: #ffaa00; padding: 20px;'>⚠️ No se encontraron resultados</p>`;
                 }
             }
 
         } catch (error) {
-            console.error("Error en la conexión del stream:", error);
-            if (responseContainer) responseContainer.innerText = "Error al conectar con el servidor.";
+            console.error('Error:', error);
+            if (responseContainer) {
+                responseContainer.innerHTML = `<p style='color: #ff6b6b; padding: 20px;'>❌ Error de conexión</p>`;
+            }
         } finally {
             isSearching = false;
-        }
-    });
-
-    searchInput?.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            searchButton?.click();
         }
     });
 });
