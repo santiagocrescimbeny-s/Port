@@ -1,21 +1,34 @@
-import 'dotenv/config';
-import express from 'express';
-import cors from 'cors';
-import searchRoutes from './routes/SearchRoutes.js';
-import { SearchService } from './services/searchService/SearchService.js';
+import express, { type Request, type Response } from 'express';
+import { query } from './dataBase/db.js'; 
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
 app.use(express.json());
 
-app.use('/api', searchRoutes);
+// Ruta de prueba
+app.get('/', (req: Request, res: Response) => {
+  res.send('¡Servidor Express con TypeScript funcionando!');
+});
 
-// Inicia el servidor y precarga el modelo
-app.listen(PORT, async () => {
-  console.log(`🚀 Microservicio ejecutándose con éxito en http://localhost:${PORT}`);
-  
-  // Precarga el modelo en background
-  await SearchService.preloadModel();
+// 🚀 Nueva Ruta de Prueba de Base de Datos
+app.get('/db-check', async (req: Request, res: Response) => {
+  try {
+    // Hacemos una consulta nativa a PostgreSQL para obtener la hora actual del servidor de AWS
+    const result = await query('SELECT NOW();');
+    res.json({
+      status: 'Conectado exitosamente a AWS RDS',
+      timestamp: result.rows[0].now
+    });
+  } catch (error: any) {
+    console.error(error);
+    res.status(500).json({ 
+      status: 'Error al conectar con la base de datos', 
+      error: error.message 
+    });
+  }
+});
+
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
