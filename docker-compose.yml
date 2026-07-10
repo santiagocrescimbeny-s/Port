@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  # --- CONTENEDOR DEL BACKEND ---
+  backend:
+    build:
+      context: ./backEnd
+      dockerfile: Dockerfile
+    container_name: portfolio-backend-container
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=database-1.ce1w2kas019p.us-east-1.rds.amazonaws.com
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_NAME=portfolio
+      - DB_PASSWORD=TU_CONTRASEÑA_SECRETA_AQUI
+
+  # --- CONTENEDOR DEL FRONTEND ---
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: portfolio-frontend-container
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend

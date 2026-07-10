@@ -1,0 +1,10 @@
+# Ignorar dependencias de Node en cualquier subcarpeta
+**/node_modules/
+
+# Ignorar archivos de variables de entorno en cualquier lugar
+**/.env
+**/.env.local
+
+# Ignorar carpetas de compilación
+**/dist/
+**/.astro/
