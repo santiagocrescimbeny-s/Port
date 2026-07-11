@@ -33,5 +33,5 @@ COPY --from=builder /app/dist ./dist
 # Exponemos el puerto 3000 que es donde corre Express
 EXPOSE 3000
 
-# Ejecutamos el archivo principal (usando minúscula para 'server.js')
+# Ejecutamos el archivo principal
 CMD ["node", "dist/server.js"]
