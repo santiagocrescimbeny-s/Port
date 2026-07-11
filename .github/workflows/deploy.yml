@@ -1,59 +1,59 @@
-# name: Deploy Portfolio to AWS ECS
+name: Deploy Portfolio to AWS ECS
 
-# on:
-#   push:
-#     branches:
-#       - main # Se activa automáticamente cuando haces git push a la rama main
+on:
+  push:
+    branches:
+      - main # Se activa automáticamente cuando haces git push a la rama main
 
-# jobs:
-#   deploy:
-#     name: Build and Push to ECR & ECS
-#     runs-on: ubuntu-latest
+jobs:
+  deploy:
+    name: Build and Push to ECR & ECS
+    runs-on: ubuntu-latest
 
-#     steps:
-#       # 1. Descargar el código del repositorio en la máquina virtual de GitHub
-#       - name: Checkout Code
-#         uses: actions/checkout@v4
+    steps:
+      # 1. Descargar el código del repositorio en la máquina virtual de GitHub
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-#       # 2. Configurar las credenciales de AWS usando los secretos que guardamos
-#       - name: Configure AWS Credentials
-#         uses: aws-actions/configure-aws-credentials@v4
-#         with:
-#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#           aws-region: us-east-1
+      # 2. Configurar las credenciales de AWS usando los secretos que guardamos
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
-#       # 3. Loguearse en AWS ECR
-#       - name: Login to Amazon ECR
-#         id: login-ecr
-#         uses: aws-actions/amazon-ecr-login@v2
+      # 3. Loguearse en AWS ECR
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
 
-#       # 4. Construir y subir la imagen del BACKEND
-#       - name: Build, Tag, and Push Backend Image to ECR
-#         env:
-#           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-#           ECR_REPOSITORY: portfolio-backend
-#           IMAGE_TAG: latest
-#         run: |
-#           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./backEnd
-#           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+      # 4. Construir y subir la imagen del BACKEND
+      - name: Build, Tag, and Push Backend Image to ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: portfolio-backend
+          IMAGE_TAG: latest
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./backEnd
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-#       # 5. Construir y subir la imagen del FRONTEND
-#       - name: Build, Tag, and Push Frontend Image to ECR
-#         env:
-#           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-#           ECR_REPOSITORY: portfolio-frontend
-#           IMAGE_TAG: latest
-#         run: |
-#           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./frontEnd
-#           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+      # 5. Construir y subir la imagen del FRONTEND
+      - name: Build, Tag, and Push Frontend Image to ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: portfolio-frontend
+          IMAGE_TAG: latest
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./frontEnd
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-#       # 6. Forzar la actualización en AWS ECS para el Backend
-#       - name: Deploy Backend to Amazon ECS
-#         run: |
-#           aws ecs update-service --cluster portfolio-cluster --service portfolio-backend-service --force-new-deployment
+      # 6. Forzar la actualización en AWS ECS para el Backend
+      - name: Deploy Backend to Amazon ECS
+        run: |
+          aws ecs update-service --cluster portfolio-cluster --service portfolio-backend-service --force-new-deployment
 
-#       # 7. Forzar la actualización en AWS ECS para el Frontend
-#       - name: Deploy Frontend to Amazon ECS
-#         run: |
-#           aws ecs update-service --cluster portfolio-cluster --service portfolio-frontend-service --force-new-deployment
+      # 7. Forzar la actualización en AWS ECS para el Frontend
+      - name: Deploy Frontend to Amazon ECS
+        run: |
+          aws ecs update-service --cluster portfolio-cluster --service portfolio-frontend-service --force-new-deployment
