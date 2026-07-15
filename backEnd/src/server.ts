@@ -1,10 +1,14 @@
 import express, { type Request, type Response } from 'express';
 import { query } from './dataBase/db.js'; 
+import projectsRoutes from './routes/ProjectsRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+
+// 2. Conectamos la ruta con el prefijo global
+app.use('/api/projects', projectsRoutes);
 
 // Ruta de prueba
 app.get('/', (req: Request, res: Response) => {
