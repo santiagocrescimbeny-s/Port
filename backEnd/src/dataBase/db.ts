@@ -8,6 +8,11 @@ const pool = new Pool({
   user: process.env.DB_USER || 'postgres',
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME || 'portfolio',
+  
+  // === AGREGA ESTA LÍNEA CLAVE AQUÍ ===
+  // Si existe DB_HOST (estamos en AWS), activa SSL. Si no, desactívalo para local.
+  ssl: process.env.DB_HOST ? { rejectUnauthorized: false } : false,
+
   // Configuraciones de producción recomendadas para AWS:
   max: 10, // Máximo número de clientes simultáneos en el pool
   idleTimeoutMillis: 30000, // Tiempo para cerrar conexiones inactivas
@@ -16,7 +21,7 @@ const pool = new Pool({
 
 // Evento para monitorear que el pool se conectó correctamente
 pool.on('connect', () => {
-  console.log('📦 Conexión establecida exitosamente con el Pool de PostgreSQL');
+  console.log('🔌 Conexión establecida exitosamente con el Pool de PostgreSQL');
 });
 
 // Evento por si ocurre un error inesperado en un cliente inactivo

@@ -1,1 +1,0 @@
-//Un resumen de tus proyectos más importantes con enlaces (o referencias) a ellos.
