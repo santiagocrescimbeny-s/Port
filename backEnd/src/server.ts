@@ -1,6 +1,7 @@
 import express, { type Request, type Response } from 'express';
 import { query } from './dataBase/db.js'; 
 import projectsRoutes from './routes/ProjectsRoutes.js';
+import aiRoutes from './routes/AiRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -9,6 +10,8 @@ app.use(express.json());
 
 // 2. Conectamos la ruta con el prefijo global
 app.use('/api/projects', projectsRoutes);
+app.use('/api/ai', aiRoutes);
+
 
 // Ruta de prueba
 app.get('/', (req: Request, res: Response) => {
