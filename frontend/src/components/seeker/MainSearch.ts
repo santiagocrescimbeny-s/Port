@@ -16,6 +16,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let isSearching = false;
     let mouseLeaveTimeout: number | null = null;
 
+    // Persistencia de sesión única para mantener el contexto conversacional por pestaña/usuario
+    let sessionId = sessionStorage.getItem('portfolio_session_id');
+    if (!sessionId) {
+        sessionId = `session_${Math.random().toString(36).substr(2, 9)}_${Date.now()}`;
+        sessionStorage.setItem('portfolio_session_id', sessionId);
+    }
+
     if (interactiveZone && searchWrapper && eyeWrapper && eyeElement && brandWrapper && flashEffect) {
         interactiveZone.addEventListener('mouseenter', () => {
             if (mouseLeaveTimeout) {
@@ -70,55 +77,52 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!searchInput || !searchInput.value.trim()) return;
         const query = searchInput.value;
 
+        // Lee dinámicamente la URL de tu API (elimina la barra inclinada final en caso de que exista)
+        const baseUrl = (import.meta.env.PUBLIC_API_URL || 'http://localhost:3000').replace(/\/$/, '');
+
         try {
             isSearching = true;
             if (responseContainer) {
                 responseContainer.classList.add('visible');
-                responseContainer.innerHTML = "<p style='color: #00f2fe; text-align: center;'>⏳ Buscando...</p>";
+                responseContainer.innerHTML = "<p style='color: #00f2fe; text-align: center; font-family: sans-serif; margin: 20px 0;'>⚡ Consultando a mi asistente virtual...</p>";
             }
 
-            // ✅ NUEVA LÓGICA: Llamada JSON, no streaming
-            const response = await fetch("http://localhost:3000/api/search", {
+            // Llamada POST directa al backend de la IA (No stream)
+            const response = await fetch(`${baseUrl}/api/ai/chat`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ prompt: query })
+                body: JSON.stringify({ 
+                    message: query,
+                    sessionId: sessionId
+                })
             });
 
             const jsonData = await response.json();
 
             if (!response.ok) {
                 if (responseContainer) {
-                    responseContainer.innerHTML = `<p style='color: #ff6b6b;'>❌ Error: ${jsonData.error}</p>`;
+                    responseContainer.innerHTML = `<p style='color: #ff6b6b; padding: 20px; text-align: center;'>❌ Error: ${jsonData.error || 'No se pudo conectar con el asistente'}</p>`;
                 }
                 return;
             }
 
-            // ✅ Mostrar resultados
-            if (jsonData.success && jsonData.results.length > 0) {
-                let html = '<div style="padding: 20px;">';
-                html += `<h3 style="color: #00f2fe; margin-top: 0;">📚 Resultados para: "${query}"</h3>`;
+            // Mostrar la respuesta conversacional estructurada de Gemini
+            if (jsonData.success && jsonData.data) {
+                let html = '<div style="padding: 20px; font-family: sans-serif; line-height: 1.6;">';
+                html += `<h3 style="color: #00f2fe; margin-top: 0; font-size: 16px; border-bottom: 1px solid rgba(0, 242, 254, 0.2); padding-bottom: 8px; font-weight: 600; letter-spacing: 0.5px;">🤖 ASISTENTE VIRTUAL</h3>`;
                 
-                jsonData.results.forEach((result: any, index: number) => {
-                    html += `
-                        <div style="
-                            background: rgba(0, 242, 254, 0.05);
-                            border-left: 3px solid #00f2fe;
-                            padding: 15px;
-                            margin: 10px 0;
-                            border-radius: 5px;
-                        ">
-                            <p style="color: #ffffff; margin: 0 0 8px 0;">
-                                <strong>Resultado ${index + 1}</strong>
-                            </p>
-                            <p style="color: #cccccc; margin: 0; line-height: 1.6; font-size: 14px;">
-                                ${result.content}
-                            </p>
-                            ${result.similarity ? `<p style="color: #888; font-size: 12px; margin: 8px 0 0 0;">
-                                Relevancia: ${(result.similarity * 100).toFixed(1)}%
-                            </p>` : ''}
-                        </div>
-                    `;
-                });
+                html += `
+                    <div style="
+                        background: rgba(0, 242, 254, 0.03);
+                        border-left: 3px solid #00f2fe;
+                        padding: 15px;
+                        margin: 15px 0 5px 0;
+                        border-radius: 4px;
+                        color: #e0e0e0;
+                        font-size: 14px;
+                        white-space: pre-wrap;
+                    ">${jsonData.data}</div>
+                `;
                 
                 html += '</div>';
                 if (responseContainer) {
@@ -126,14 +130,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else {
                 if (responseContainer) {
-                    responseContainer.innerHTML = `<p style='color: #ffaa00; padding: 20px;'>⚠️ No se encontraron resultados</p>`;
+                    responseContainer.innerHTML = `<p style='color: #ffaa00; padding: 20px; text-align: center;'>⚠️ El asistente no devolvió una respuesta válida.</p>`;
                 }
             }
 
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Error al consultar el asistente virtual:', error);
             if (responseContainer) {
-                responseContainer.innerHTML = `<p style='color: #ff6b6b; padding: 20px;'>❌ Error de conexión</p>`;
+                responseContainer.innerHTML = `<p style='color: #ff6b6b; padding: 20px; text-align: center;'>❌ Error de conexión con el cerebro de la IA.</p>`;
             }
         } finally {
             isSearching = false;

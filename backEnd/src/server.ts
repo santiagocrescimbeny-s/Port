@@ -5,8 +5,10 @@ import aiRoutes from './routes/AiRoutes.js';
 import aiSearchLogsRoutes from './routes/AiSearchLogsRoutes.js';
 import aiKnowledgeBaseRoutes from './routes/AiKnowledgeBaseRoutes.js';
 import experiencesRoutes from './routes/ExperiencesRoutes.js';
+import cors from 'cors';
 
 const app = express();
+app.use(cors());
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
