@@ -76,6 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!searchInput || !searchInput.value.trim()) return;
         const query = searchInput.value;
+        searchInput.value = '';
 
         // Lee dinámicamente la URL de tu API (elimina la barra inclinada final en caso de que exista)
         const baseUrl = (import.meta.env.PUBLIC_API_URL || 'https://api.santiagocrescimbeni.com').replace(/\/$/, '');
@@ -89,7 +90,10 @@ document.addEventListener('DOMContentLoaded', () => {
             // Llamada POST directa al backend de la IA (No stream)
             const response = await fetch(`${baseUrl}/api/ai/chat`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
                 body: JSON.stringify({
                     message: query,
                     sessionId: sessionId
@@ -136,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Error al consultar el asistente virtual:', error);
             if (responseContainer) {
-                responseContainer.innerHTML = `<p style='color: #ff6b6b; padding: 20px; text-align: center;'>❌ Error de conexión con el cerebro de la IA.</p>`;
+                responseContainer.innerHTML = `<p style='color: #ff6b6b; padding: 20px; text-align: center;'>❌ Error de conexión con el cerebro de la IA: ${(error as Error).message}</p>`;
             }
         } finally {
             isSearching = false;
