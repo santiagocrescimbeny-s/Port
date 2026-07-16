@@ -78,8 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const query = searchInput.value;
 
         // Lee dinámicamente la URL de tu API (elimina la barra inclinada final en caso de que exista)
-        const baseUrl = (import.meta.env.PUBLIC_API_URL || 'http://localhost:3000').replace(/\/$/, '');
-
+        const baseUrl = (import.meta.env.PUBLIC_API_URL || 'https://api.santiagocrescimbeni.com').replace(/\/$/, '');
         try {
             isSearching = true;
             if (responseContainer) {
@@ -91,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(`${baseUrl}/api/ai/chat`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ 
+                body: JSON.stringify({
                     message: query,
                     sessionId: sessionId
                 })
@@ -110,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (jsonData.success && jsonData.data) {
                 let html = '<div style="padding: 20px; font-family: sans-serif; line-height: 1.6;">';
                 html += `<h3 style="color: #00f2fe; margin-top: 0; font-size: 16px; border-bottom: 1px solid rgba(0, 242, 254, 0.2); padding-bottom: 8px; font-weight: 600; letter-spacing: 0.5px;">🤖 ASISTENTE VIRTUAL</h3>`;
-                
+
                 html += `
                     <div style="
                         background: rgba(0, 242, 254, 0.03);
@@ -123,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         white-space: pre-wrap;
                     ">${jsonData.data}</div>
                 `;
-                
+
                 html += '</div>';
                 if (responseContainer) {
                     responseContainer.innerHTML = html;
