@@ -4,6 +4,7 @@ import projectsRoutes from './routes/ProjectsRoutes.js';
 import aiRoutes from './routes/AiRoutes.js';
 import aiSearchLogsRoutes from './routes/AiSearchLogsRoutes.js';
 import aiKnowledgeBaseRoutes from './routes/AiKnowledgeBaseRoutes.js';
+import experiencesRoutes from './routes/ExperiencesRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -15,6 +16,7 @@ app.use('/api/projects', projectsRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/ai', aiSearchLogsRoutes);
 app.use('/api/ai', aiKnowledgeBaseRoutes);
+app.use('/api/experiences', experiencesRoutes);
 
 
 // Ruta de prueba
