@@ -38,7 +38,7 @@ export class AiSearchLogsRepository {
 
   // 2. Traer todos los logs (para tu futuro panel de administrador)
   // Incluye un JOIN opcional con visitor_sessions si quieres ver de qué país/ciudad nos visitaron
-  static async getAll(): Promise<any[]> {
+ static async getAll(): Promise<any[]> {
     const queryText = `
       SELECT 
         l.id,
@@ -52,7 +52,7 @@ export class AiSearchLogsRepository {
         v.city,
         v.company_name
       FROM ai_search_logs l
-      LEFT JOIN visitor_sessions v ON l.session_id = v.session_id
+      LEFT JOIN visitor_sessions v ON l.session_id = v.id
       ORDER BY l.created_at DESC
     `;
     const { rows } = await pool.query(queryText);
