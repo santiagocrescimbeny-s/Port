@@ -36,8 +36,7 @@ export class AiSearchLogsRepository {
     return rows[0];
   }
 
-  // 2. Traer todos los logs (para tu futuro panel de administrador)
-  // Incluye un JOIN opcional con visitor_sessions si quieres ver de qué país/ciudad nos visitaron
+
  static async getAll(): Promise<any[]> {
     const queryText = `
       SELECT 

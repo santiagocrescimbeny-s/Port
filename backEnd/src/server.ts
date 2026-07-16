@@ -3,6 +3,7 @@ import { query } from './dataBase/db.js';
 import projectsRoutes from './routes/ProjectsRoutes.js';
 import aiRoutes from './routes/AiRoutes.js';
 import aiSearchLogsRoutes from './routes/AiSearchLogsRoutes.js';
+import aiKnowledgeBaseRoutes from './routes/AiKnowledgeBaseRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -13,7 +14,7 @@ app.use(express.json());
 app.use('/api/projects', projectsRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/ai', aiSearchLogsRoutes);
-
+app.use('/api/ai', aiKnowledgeBaseRoutes);
 
 
 // Ruta de prueba
