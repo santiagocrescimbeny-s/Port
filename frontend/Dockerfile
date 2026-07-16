@@ -12,7 +12,13 @@ RUN npm install
 # Copiamos todo el código del frontend
 COPY . .
 
-# Compilamos el proyecto de Astro (Esto generará la carpeta 'dist')
+# 1. Declaramos el argumento que va a recibir la URL de la API
+ARG PUBLIC_API_URL
+
+# 2. Se la pasamos como variable de entorno al proceso de build de Astro
+ENV PUBLIC_API_URL=$PUBLIC_API_URL
+
+# Compilamos el proyecto de Astro (Ahora sí va a inyectar la URL de producción)
 RUN npm run build
 
 
