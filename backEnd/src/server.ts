@@ -15,6 +15,7 @@ app.use('/api/ai', aiRoutes);
 app.use('/api/ai', aiSearchLogsRoutes);
 
 
+
 // Ruta de prueba
 app.get('/', (req: Request, res: Response) => {
   res.send('¡Servidor Express con TypeScript funcionando!');

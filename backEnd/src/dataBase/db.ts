@@ -1,22 +1,31 @@
 import { Pool } from 'pg';
 
-// Configuramos el Pool leyendo directamente las variables de entorno (process.env)
-// Si no existen (por ejemplo, en desarrollo local básico), asume valores por defecto seguros.
-const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '5432', 10),
-  user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME || 'portfolio',
-  
-  // === AGREGA ESTA LÍNEA CLAVE AQUÍ ===
-  // Si existe DB_HOST (estamos en AWS), activa SSL. Si no, desactívalo para local.
-  ssl: process.env.DB_HOST ? { rejectUnauthorized: false } : false,
+// 1. Detectamos el entorno de base de datos.
+// Si existe DATABASE_URL (en producción), se conecta usando el string de conexión único.
+// Si no existe, recurre a las variables individuales para desarrollo local.
+const poolConfig = process.env.DATABASE_URL
+  ? {
+      connectionString: process.env.DATABASE_URL,
+      ssl: {
+        rejectUnauthorized: false, // Requerido para la conexión segura con AWS RDS
+      },
+    }
+  : {
+      host: process.env.DB_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT || '5432', 10),
+      user: process.env.DB_USER || 'postgres',
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME || 'portfolio_local',
+      // Si por alguna razón usas SSL en local, se activará según el NODE_ENV
+      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    };
 
-  // Configuraciones de producción recomendadas para AWS:
+// 2. Instanciamos el Pool aplicando configuraciones recomendadas para producción en AWS Fargate
+const pool = new Pool({
+  ...poolConfig,
   max: 10, // Máximo número de clientes simultáneos en el pool
   idleTimeoutMillis: 30000, // Tiempo para cerrar conexiones inactivas
-  connectionTimeoutMillis: 2000, // Tiempo límite para entablar una conexión
+  connectionTimeoutMillis: 5000, // Tiempo límite (5s) para entablar una conexión antes de dar timeout
 });
 
 // Evento para monitorear que el pool se conectó correctamente
