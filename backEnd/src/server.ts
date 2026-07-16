@@ -15,11 +15,13 @@ app.use(cors({
     'https://santiagocrescimbeni.com',
     'https://www.santiagocrescimbeni.com',
     'http://localhost:4321', // Puerto por defecto de Astro para desarrollo local
-    'http://localhost:3000'
+    'http://localhost:3000',
+    'http://localhost:5173'  // Puerto alternativo de desarrollo
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
+  credentials: true,
+  optionsSuccessStatus: 200
 }));
 
 const PORT = process.env.PORT || 3000;
