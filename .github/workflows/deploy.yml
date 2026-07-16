@@ -45,7 +45,9 @@ jobs:
           ECR_REPOSITORY: portfolio-frontend
           IMAGE_TAG: latest
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./frontend
+          docker build \
+            --build-arg PUBLIC_API_URL="https://api.santiagocrescimbeni.com" \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./frontend
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
       # 6. Forzar la actualización en AWS ECS para el Backend
