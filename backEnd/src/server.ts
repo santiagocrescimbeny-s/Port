@@ -8,7 +8,20 @@ import experiencesRoutes from './routes/ExperiencesRoutes.js';
 import cors from 'cors';
 
 const app = express();
-app.use(cors());
+
+// 1. Configuración robusta de CORS para producción y desarrollo local
+app.use(cors({
+  origin: [
+    'https://santiagocrescimbeni.com',
+    'https://www.santiagocrescimbeni.com',
+    'http://localhost:4321', // Puerto por defecto de Astro para desarrollo local
+    'http://localhost:3000'
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
+
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
