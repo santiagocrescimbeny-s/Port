@@ -16,8 +16,7 @@ app.use('/api/projects', projectsRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/ai', aiSearchLogsRoutes);
 app.use('/api/ai', aiKnowledgeBaseRoutes);
-app.use('/api/experiences', experiencesRoutes);
-
+app.use('/api', experiencesRoutes);
 
 // Ruta de prueba
 app.get('/', (req: Request, res: Response) => {
